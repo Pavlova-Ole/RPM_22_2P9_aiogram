@@ -17,34 +17,37 @@ async def start_handler(msg: Message):
         BotCommand(command='set_time', description='Задать время рассылки'), 
         BotCommand(command='help', description='Справка') 
     ])
-    markup = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='привет')]]) 
-    await msg.answer(text="Привет", reply_markup=markup) 
+    
+    inline_markup = InlineKeyboardMarkup(inline_keyboard = [
+            [InlineKeyboardButton(text='вперед', callback_data='next')]
+            ])
+    await msg.answer(text="страница 1", reply_markup=inline_markup) 
+ 
+@router.callback_query(F.data == "next")
+async def next_handler(callback_query: CallbackQuery):
+    inline_markup = InlineKeyboardMarkup(inline_keyboard = [
+        [InlineKeyboardButton(text='назад', callback_data='back')]
+         ])
+    
+    await callback_query.message.edit_text(text="страница 2", reply_markup=inline_markup)
+
 
 
     inline_markup = InlineKeyboardMarkup(inline_keyboard = [
-        [
-            InlineKeyboardButton(text='Карина', callback_data='1'),
-            InlineKeyboardButton(text='Юля', callback_data='2')],
-        [
-            InlineKeyboardButton(text='Олеся', callback_data='3')]
-    ])
-    await msg.answer(text="Привет", reply_markup=inline_markup) 
+            [InlineKeyboardButton(text='назад', callback_data='back')]
+            ])
+    await callback_query.answer(text="страница 1", reply_markup=inline_markup) 
  
+@router.callback_query(F.data == "back")
+async def next_handler(callback_query: CallbackQuery):
+    inline_markup = InlineKeyboardMarkup(inline_keyboard = [
+        [InlineKeyboardButton(text='вперед', callback_data='next')]
+         ])
+    
+    await callback_query.message.edit_text(text="страница 1", reply_markup=inline_markup)
 
 
-@router.callback_query(F.data == "1")
-async def callback_query_handler(callback_query: CallbackQuery):
-    await callback_query.message.answer(text="разработчик")
 
-
-@router.callback_query(F.data == "2")
-async def callback_query_handler(callback_query: CallbackQuery):
-    await callback_query.message.answer(text="тестировщик")
-
-
-@router.callback_query(F.data == "3")
-async def callback_query_handler(callback_query: CallbackQuery):
-    await callback_query.message.answer(text="тимлид")
 
 @router.callback_query()
 async def callback_query_handler(callback_query: CallbackQuery):
